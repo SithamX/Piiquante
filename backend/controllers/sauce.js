@@ -70,7 +70,6 @@ exports.usersLiked = (req, res, next) => {
         .then((sauce) => {
             sauce.likes += 1; // Incrémenter la valeur de "likes"
             sauce.usersLiked.push(req.body.userId); // Ajouter "req.body.userId" au tableau "usersLiked"
-  
             sauce.save() // Enregistrer le document mis à jour dans la collection
                 .then(() => res.status(200).json({ message: 'Sauce likée !' }))
                 .catch(error => res.status(401).json({ error }));
@@ -80,41 +79,37 @@ exports.usersLiked = (req, res, next) => {
         Sauce.findOne({ _id: req.params.id })
             .then((sauce) => {
                 sauce.dislikes += 1; // Incrémenter la valeur de "likes"
-                sauce.usersDisliked.push(req.body.userId); // Ajouter "req.body.userId" au tableau "usersLiked"
-    
+                sauce.usersDisliked.push(req.body.userId); // Ajouter "req.body.userId" au tableau "usersLiked
                 sauce.save() // Enregistrer le document mis à jour dans la collection
-                    .then(() => res.status(200).json({ message: 'Sauce likée !' }))
+                    .then(() => res.status(200).json({ message: 'Sauce dislikée !' }))
                     .catch(error => res.status(401).json({ error }));
             })
             .catch(error => res.status(401).json({ error }));
     } else {
         Sauce.findOne({ _id: req.params.id })
             .then((sauce) => {
-                if (sauce.usersLiked.includes(req.body.userId) !== 0) {
+                if (sauce.usersLiked.indexOf(req.body.userId) !== -1) {
                     Sauce.findOne({ _id: req.params.id })
                     .then((sauce) => {
-                        sauce.likes -= 1; // Incrémenter la valeur de "likes"
                         sauce.usersLiked.splice(req.body.userId, 1);
-            
+                        sauce.likes -= 1; // Incrémenter la valeur de "likes"                    
                         sauce.save() // Enregistrer le document mis à jour dans la collection
-                            .then(() => res.status(200).json({ message: 'Sauce likée !' }))
+                            .then(() => res.status(200).json({ message: 'Like retiré !' }))
                             .catch(error => res.status(401).json({ error }));
                     })
                     .catch(error => res.status(401).json({ error }));
-                } else if (sauce.usersDisliked.includes(req.body.userId) !== 0) {
+                } else if (sauce.usersDisliked.indexOf(req.body.userId) !== -1) {
                     Sauce.findOne({ _id: req.params.id })
                     .then((sauce) => {
-                        sauce.dislikes -= 1; // Incrémenter la valeur de "likes"
                         sauce.usersDisliked.splice(req.body.userId, 1);
-            
+                        sauce.dislikes -= 1; // Incrémenter la valeur de "likes"
                         sauce.save() // Enregistrer le document mis à jour dans la collection
-                            .then(() => res.status(200).json({ message: 'Sauce likée !' }))
+                            .then(() => res.status(200).json({ message: 'Dislike retiré !' }))
                             .catch(error => res.status(401).json({ error }));
                     })
                     .catch(error => res.status(401).json({ error }));
                 }
             })
-            
             .catch(error => res.status(401).json({ error }));
     }
 };
