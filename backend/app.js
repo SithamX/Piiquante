@@ -15,9 +15,9 @@ mongoose.connect('mongodb+srv://mathis-piiquante:piiquante@cluster1.0dyqvkc.mong
 // Création de l'application Express
 const app = express();
 
-app.use(express.json());
+app.use(express.json()); // Middleware qui intercepte toutes les requêtes qui contiennent du JSON et met leur body à disposition sur l'objet req
 
-// Middleware pour gérer les autorisations de partage des ressources entre domaines
+// Middleware qui gère les autorisations de partage des ressources entre domaines
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
