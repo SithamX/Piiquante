@@ -25,9 +25,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/sauces', sauceRoutes); // Utilise les routes spécifiées pour les endpoints '/api/sauces'
-app.use('/api/auth', userRoutes); // Utilise les routes spécifiées pour les endpoints '/api/auth'
-app.use('/images', express.static(path.join(__dirname, 'images'))); // Définit le dossier 'images' comme étant statique pour servir les fichiers d'images
+// Les routes ont été déplacées à part, cela rend l'application plus facile à comprendre et à maintenir
+app.use('/api/sauces', sauceRoutes); 
+app.use('/api/auth', userRoutes); 
+// Le dossier 'images' est défini comme étant statique pour servir les fichiers d'images
+app.use('/images', express.static(path.join(__dirname, 'images'))); 
 
 
 module.exports = app;
