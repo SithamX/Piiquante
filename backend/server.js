@@ -1,6 +1,7 @@
 const http = require('http');
 const app = require('./app');
 
+// Création d'une fonction fléchée renvoyant un port valide, qu'il soit founi sous la forme d'un numéro ou d'une chaîne
 const normalizePort = val => {
   const port = parseInt(val, 10);
 
@@ -15,6 +16,7 @@ const normalizePort = val => {
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
+// Création d'une fonction fléchée recherchant les différentes erreurs pour les gérer de manière appropriée, puis elle les enregistre dans le server
 const errorHandler = error => {
   if (error.syscall !== 'listen') {
     throw error;
