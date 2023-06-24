@@ -23,17 +23,17 @@ exports.getOneSauce = (req, res, next) => {
 };
 
 exports.modifySauce = (req, res, next) => {
-    const sauceObject = req.file ? {
+    const sauceObject = req.file ? { // Lors de la modification d'une sauce, si req.file existe (donc si l'image est modifiée), la nouvelle image est traitée, sinon, seul l'objet entrant est traité 
         ...JSON.parse(req.body.sauce),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    } : { ...req.body };
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` //  L'URL de l'image est générée en utilisant le protocole et l'hôte de la requête, ainsi que le nom de fichier fourni par multer
+    } : { ...req.body }; // Donc ici, s'il n'y à pas d'image transmise, alors on récupère directement l'objet dans le corps de la requête
 
-    delete sauceObject._userId;
+    delete sauceObject._userId;  // Suppression du champ _userId pour sécuriser la route (pour éviter qu'un client ayant créé un objet à son nom ne le modifie en le réassignant à quelqu'un d'autre)
     Sauce.findOne({_id: req.params.id})
         .then((sauce) => {
-            if (sauce.userId != req.auth.userId) {
+            if (sauce.userId != req.auth.userId) { 
                 res.status(401).json({ message: 'Not authorized' });
-            } else {
+            } else { // Si l'objet appartient bien à l'utilisateur'qui envoie la requête de modification, alors l'enregistrement est mis à jour
                 Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
                     .then(() => res.status(200).json({ message: 'Sauce modifiée !' }))
                     .catch(error => res.status(401).json({ error }));
