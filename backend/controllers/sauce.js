@@ -4,11 +4,11 @@ const fs = require('fs');
 exports.createSauce = (req, res, next) => {
     const sauceObject = JSON.parse(req.body.sauce);
     delete sauceObject._id;
-    delete sauceObject._userId;
+    delete sauceObject._userId; // Suppression du champ _userId pour sécuriser la route (pour éviter qu'un client n'utilise le _userId d'un autre)
     const sauce = new Sauce({
         ...sauceObject,
-        userId: req.auth.userId,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        userId: req.auth.userId, // Le _userId non-récupéré est remplcé par celui extrait du token d'authentification
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` //  L'URL de l'image est générée en utilisant le protocole et l'hôte de la requête, ainsi que le nom de fichier fourni par multer
     });
 
     sauce.save()

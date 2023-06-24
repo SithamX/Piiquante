@@ -1,4 +1,5 @@
-const multer = require('multer');
+// Importation du package Multer pour gérer le téléchargement de fichiers images
+const multer = require('multer'); 
 
 const MIME_TYPES = {
   'image/jpg': 'jpg',

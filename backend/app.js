@@ -1,6 +1,6 @@
 const express = require('express'); // Importation du module 'express' pour créer une application web
 const mongoose = require('mongoose'); // Importation du module 'mongoose' pour interagir avec la base de données MongoDB
-const path = require('path'); // Importation du module 'path' pour gérer les chemins de fichiers
+const path = require('path'); // Importation du module 'path' pour gérer les chemins de fichiers (le module est utilisé pour le app.use des images)
 
 const userRoutes = require('./routes/user');
 const sauceRoutes = require('./routes/sauce');
@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 // Les routes ont été déplacées à part, cela rend l'application plus facile à comprendre et à maintenir
 app.use('/api/sauces', sauceRoutes); 
 app.use('/api/auth', userRoutes); 
-// Le dossier 'images' est défini comme étant statique pour servir les fichiers d'images
+// Indication à Express qu'il faut gérer la ressource "images" de manière statique pour servir les fichier d'images
 app.use('/images', express.static(path.join(__dirname, 'images'))); 
 
 
