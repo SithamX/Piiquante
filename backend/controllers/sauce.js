@@ -74,51 +74,50 @@ exports.getAllSauces = (req, res, next) => {
 
 
 exports.likeAndDislikeSauce = (req, res, next) => {
-    if (req.body.like === 1) {
+    if (req.body.like === 1) { // Si l'utilisateur à effectué un like (puisque si c'est positif, c'est qu'il est question d'un like), alors :
       Sauce.findOne({ _id: req.params.id })
         .then((sauce) => {
-            sauce.likes += 1; // Incrémente la valeur de "likes"
-            sauce.usersLiked.push(req.body.userId); // Ajoute "req.body.userId" au tableau "usersLiked"
-            sauce.save() // Enregistre le document mis à jour dans la collection
+            sauce.likes += 1; // la valeur est incrémentée ;
+            sauce.usersLiked.push(req.body.userId); // l'id de l'utilisateur ayant liké la sauce est ajouté dans le tableau correspondant ;
+            sauce.save() // puis tout cela est enregistré dans la base de données.
                 .then(() => res.status(200).json({ message: 'Sauce likée !' }))
-                .catch(error => res.status(401).json({ error }));
+                .catch(error => res.status(400).json({ error }));
         })
-        .catch(error => res.status(401).json({ error }));
-    } else if (req.body.like === -1){
+        .catch(error => res.status(404).json({ error }));
+    } else if (req.body.like === -1){ // Si l'utilisateur à effectué un dislike (puisque si c'est négatif, c'est qu'il est question d'un dislike), alors :
         Sauce.findOne({ _id: req.params.id })
             .then((sauce) => {
-                sauce.dislikes += 1; // Décrémente la valeur de "likes"
-                sauce.usersDisliked.push(req.body.userId); // Ajoute "req.body.userId" au tableau "usersLiked
-                sauce.save() // Enregistre le document mis à jour dans la collection
+                sauce.dislikes += 1; // la valeur est incrémentée ;
+                sauce.usersDisliked.push(req.body.userId); // l'id de l'utilisateur ayant liké la sauce est ajouté dans le tableau correspondant ;
+                sauce.save() // puis tout cela est enregistré dans la base de données.
                     .then(() => res.status(200).json({ message: 'Sauce dislikée !' }))
-                    .catch(error => res.status(401).json({ error }));
+                    .catch(error => res.status(400).json({ error }));
             })
-            .catch(error => res.status(401).json({ error }));
-    } else {
+            .catch(error => res.status(404).json({ error }));
+    } else { // Si l'utilisateur retire son like ou son dislike, alors :
         Sauce.findOne({ _id: req.params.id })
             .then((sauce) => {
-                if (sauce.usersLiked.indexOf(req.body.userId) !== -1) {
-                    Sauce.findOne({ _id: req.params.id })
-                    .then((sauce) => {
-                        sauce.usersLiked.splice(req.body.userId, 1);
-                        sauce.likes -= 1; // Décrémente la valeur de "likes"                    
-                        sauce.save() // Enregistre le document mis à jour dans la collection
-                            .then(() => res.status(200).json({ message: 'Like retiré !' }))
-                            .catch(error => res.status(401).json({ error }));
-                    })
-                    .catch(error => res.status(401).json({ error }));
-                } else if (sauce.usersDisliked.indexOf(req.body.userId) !== -1) {
-                    Sauce.findOne({ _id: req.params.id })
-                    .then((sauce) => {
-                        sauce.usersDisliked.splice(req.body.userId, 1);
-                        sauce.dislikes -= 1; // Incrémente la valeur de "likes"
-                        sauce.save() // Enregistre le document mis à jour dans la collection
-                            .then(() => res.status(200).json({ message: 'Dislike retiré !' }))
-                            .catch(error => res.status(401).json({ error }));
-                    })
-                    .catch(error => res.status(401).json({ error }));
+
+                // Précision : dans les deux conditions suivantes, la méthode indexOff est utilisée, cette méthode compare l'élément recheché aux éléments contenus dans le tableau spécifié, 
+                // si l'élément n'est pas trouvé, alors elle renvoie -1 (c'est un peu comme si elle renvoyait "false" en cas d'échec) donc, dans les deux conditions,
+                // en ajoutant "!== -1" on précise que l'on recherche un cas où la réponse de indexOf doit être nécessairement valide (puisque différente de -1).
+                //
+                // Pour être plus concret, en prenant pour exemple la première condition, avant de retirer le like on dit "si dans le tableau usersLiked il y à l'ID de l'utilisateur qui appuie sur le bouton like, alors :" (et les lignes de code en dessous des conditions donnent les instructions à suivre).
+
+                if (sauce.usersLiked.indexOf(req.body.userId) !== -1) { // dans le cas où l'utilisateur avait déjà effectué un "like" :    
+                    sauce.usersLiked.splice(req.body.userId, 1); // l'ID de l'utilisateur est retiré du tableau "usersLiked" ;
+                    sauce.likes -= 1; // la valeur est décrémentée ;                   
+                    sauce.save() // puis tout cela est enregistré dans la base de données.
+                        .then(() => res.status(200).json({ message: 'Like retiré !' }))
+                        .catch(error => res.status(400).json({ error })); 
+                } else if (sauce.usersDisliked.indexOf(req.body.userId) !== -1) {  // dans le cas où l'utilisateur avait déjà effectué un "dislike" :
+                    sauce.usersDisliked.splice(req.body.userId, 1); // l'ID de l'utilisateur est retiré du tableau "usersDisiked" ;
+                    sauce.dislikes -= 1; // la valeur est décrémentée ; 
+                    sauce.save() // puis tout cela est enregistré dans la base de données.
+                        .then(() => res.status(200).json({ message: 'Dislike retiré !' }))
+                        .catch(error => res.status(400).json({ error })); 
                 }
             })
-            .catch(error => res.status(401).json({ error }));
-    }
+            .catch(error => res.status(404).json({ error }));
+        }
 };
