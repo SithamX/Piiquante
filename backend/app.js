@@ -25,11 +25,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// Indication à Express qu'il faut gérer la ressource "images" de manière statique pour servir les fichier d'images
-app.use('/images', express.static(path.join(__dirname, 'images'))); 
 // Les routes ont été déplacées à part, cela rend l'application plus facile à comprendre et à maintenir
 app.use('/api/sauces', sauceRoutes); 
 app.use('/api/auth', userRoutes); 
+// Indication à Express qu'il faut gérer la ressource "images" de manière statique pour servir les fichier d'images
+app.use('/images', express.static(path.join(__dirname, 'images'))); 
 
 
 module.exports = app;
