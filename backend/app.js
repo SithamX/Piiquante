@@ -1,19 +1,21 @@
 const express = require('express'); // Importation du module 'express' pour créer une application web
+const app = express(); // Création de l'application Express
+
 const mongoose = require('mongoose'); // Importation du module 'mongoose' pour interagir avec la base de données MongoDB
 const path = require('path'); // Importation du module 'path' pour gérer les chemins de fichiers (le module est utilisé pour le app.use des images)
 
 const userRoutes = require('./routes/user');
 const sauceRoutes = require('./routes/sauce');
 
+const dotenv = require("dotenv");
+dotenv.config();
+
 // Connexion à la base de données MongoDB
-mongoose.connect('mongodb+srv://mathis-piiquante:piiquante@cluster1.0dyqvkc.mongodb.net/?retryWrites=true&w=majority',
+mongoose.connect('mongodb+srv://'+process.env.idMongoDb+':'+process.env.passwordMongoDb+'@'+process.env.urlMongoDb,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
-
-// Création de l'application Express
-const app = express();
 
 app.use(express.json()); // Middleware qui intercepte toutes les requêtes qui contiennent du JSON et met leur body à disposition sur l'objet req
 

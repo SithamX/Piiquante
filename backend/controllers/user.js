@@ -1,6 +1,9 @@
 const bcrypt = require('bcrypt'); // Importation du package de chiffrement
 const jwt = require('jsonwebtoken'); // Importation du package permettant de créer et de vérifier des tokens d'authentification
 
+require("dotenv").config();
+const JWT_SECRET = process.env.TOKEN_SECRET || "cryptedToken";
+
 const User = require('../models/User');
 
 exports.signup = (req, res, next) => {
@@ -32,7 +35,7 @@ exports.login = (req, res, next) => {
                         userId: user._id, // on ajoute l'id de l'utilisateur ;
                         token: jwt.sign( // on ajout le token en utilisant la fonction sign de jsonwebtoken pour chiffrer un nouveau mot de passe ;
                             { userId: user._id }, // on s'assure que la requête correspond bien au bon userId
-                            'RANDOM_TOKEN_SECRET', // on utilise une chaîne secrète de développement temporaire (qui sera remplacée par une chaîne aléatoire)
+                            JWT_SECRET, // on utilise une chaîne secrète de développement temporaire (qui sera remplacée par une chaîne aléatoire)
                             { expiresIn: '24h' } // on choisit une durée de validité du token de 24 heures, donc l'utilisateur devra se reconnecter au bout de 24 heures.
                         )
                     });
