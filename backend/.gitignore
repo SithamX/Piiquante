@@ -1,4 +1,5 @@
 node_modules
-images
+images/*
 !images/.gitkeep 
-.env
+routes
+
