@@ -1,10 +1,10 @@
 const bcrypt = require('bcrypt'); // Importation du package de chiffrement
 const jwt = require('jsonwebtoken'); // Importation du package permettant de créer et de vérifier des tokens d'authentification
 
-require("dotenv").config();
-const JWT_SECRET = process.env.TOKEN_SECRET || "cryptedToken";
-
 const User = require('../models/User');
+
+require("dotenv").config(); // Chargement des variables d'environnement à partir du fichier .env
+const JWT_SECRET = process.env.TOKEN_SECRET; // Utilisation de la variable d'environnement TOKEN_SECRET 
 
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10) // Le mot de passe reçu dans la requête est hashé et l'algorythme de hashage fait 10 tours ( ce qui est suffisant pour créer un mot de passe sécurisé rapidement)
@@ -34,9 +34,9 @@ exports.login = (req, res, next) => {
                     res.status(200).json({  // Si les mots de passe correspondent, on génère la réponse suivante dans un objet JSON :
                         userId: user._id, // on ajoute l'id de l'utilisateur ;
                         token: jwt.sign( // on ajout le token en utilisant la fonction sign de jsonwebtoken pour chiffrer un nouveau mot de passe ;
-                            { userId: user._id }, // on s'assure que la requête correspond bien au bon userId
-                            JWT_SECRET, // on utilise une chaîne secrète de développement temporaire (qui sera remplacée par une chaîne aléatoire)
-                            { expiresIn: '24h' } // on choisit une durée de validité du token de 24 heures, donc l'utilisateur devra se reconnecter au bout de 24 heures.
+                            { userId: user._id }, // on s'assure que la requête correspond bien au bon userId ;
+                            JWT_SECRET, // on utilise la clé secrète pour chiffrer le token ;
+                            { expiresIn: '24h' } // et on choisit 24 heures comme durée de validité du token, donc l'utilisateur devra se reconnecter au bout de 24 heures.
                         )
                     });
                 })
