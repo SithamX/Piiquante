@@ -12,4 +12,4 @@ Rendez-vous dans le dossier `backend`, tapez la commande `npm install` puis `npm
 
 ## Précision importante :
 
-Un fichier `.env` à été ajouté dans le  `.gitignore` pour sécuriser ce qui s'y trouve. Car c'est dans ce fichier que sont stockés l'identifant, le mot de pass et l'url du cluster MongoDB utilisé ainsi que l'algorithme de génération aléatoire d'un TOKEN d'authentification. 
+Un fichier `.env` à été ajouté dans le  `.gitignore` pour sécuriser ce qui s'y trouve. Car c'est dans ce fichier que sont stockés l'identifant, le mot de passe et l'url du cluster MongoDB utilisé ainsi que l'algorithme de génération aléatoire du TOKEN d'authentification. 
