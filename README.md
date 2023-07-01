@@ -10,7 +10,7 @@ Dans le dossier `backend` créez un fichier `.env`, et dans ce fichier, veuillez
 
 ```
 idMongoDb = (à la place de ces parenthèses écrivez votre identifant entre des guillemets)
-passwordMongoDb = (à la place de ces parenthèses écrivez votre mode de passe entre des guillemets)
+passwordMongoDb = (à la place de ces parenthèses écrivez votre mot de passe entre des guillemets)
 urlMongoDb = (à la place de ces parenthèses et entre des guillemets, écrivez la suite de l'url situé après le arobase)
 ```
 
