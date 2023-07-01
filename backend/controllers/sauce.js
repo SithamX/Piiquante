@@ -74,50 +74,37 @@ exports.getAllSauces = (req, res, next) => {
 
 
 exports.likeAndDislikeSauce = (req, res, next) => {
-    if (req.body.like === 1) { // Si l'utilisateur à effectué un like (puisque si c'est positif, c'est qu'il est question d'un like), alors :
-      Sauce.findOne({ _id: req.params.id })
+    Sauce.findOne({ _id: req.params.id }) // Recherche d'une sauce spécifique dans la base de données en utilisant l'ID fourni dans les paramètres de la requête
         .then((sauce) => {
-            sauce.likes += 1; // la valeur est incrémentée ;
-            sauce.usersLiked.push(req.body.userId); // l'id de l'utilisateur ayant liké la sauce est ajouté dans le tableau correspondant ;
-            sauce.save() // puis tout cela est enregistré dans la base de données.
-                .then(() => res.status(200).json({ message: 'Sauce likée !' }))
+            if (req.body.like === 1) { // Si l'utilisateur à effectué un like (puisque si c'est positif, c'est qu'il est question d'un like), alors :
+                if (!sauce.usersLiked.includes(req.auth.userId)) { // on vérifie si l'utilisateur n'a pas déjà liké la sauce ;
+                    sauce.likes += 1; // on incrémente la valeur ;
+                    sauce.usersLiked.push(req.auth.userId); // et on ajoute l'id de l'utilisateur ayant liké la sauce dans le tableau correspondant.
+                } else {
+                    return res.status(400).json({ message: "Vous avez déjà liké cette sauce." });
+                }
+            } else if (req.body.like === -1) {  // Si l'utilisateur à effectué un dislike (puisque si c'est négatif, c'est qu'il est question d'un dislike), alors :
+                if (!sauce.usersDisliked.includes(req.auth.userId)) { // on vérifie si l'utilisateur n'a pas déjà disliké la sauce ;
+                    sauce.dislikes += 1; // on incrémente la valeur ;
+                    sauce.usersDisliked.push(req.auth.userId); // et on ajoute l'id de l'utilisateur ayant liké la sauce dans le tableau correspondant.
+                } else {
+                    return res.status(400).json({ message: "Vous avez déjà disliké cette sauce." });
+                }
+            } else if (req.body.like === 0) { // Si l'utilisateur souhaite retirer son like ou son dislike (puisque le zéro signifie que l'utilisateur annule l'action qu'il a effectuée), alors :
+                if (sauce.usersLiked.includes(req.auth.userId)) { // on vérifie si l'utilisateur a déjà liké la sauce ;
+                    sauce.likes -= 1; // puis on décrémente la valeur ;
+                    sauce.usersLiked = sauce.usersLiked.filter(userId => userId !== req.auth.userId); // et on retire l'id de l'utilisateur ayant liké la sauce du tableau correspondant ;
+                } else if (sauce.usersDisliked.includes(req.auth.userId)) { // ou on vérifie si l'utilisateur a déjà disliké la sauce ;
+                    sauce.dislikes -= 1; // puis on décrémente la valeur ;
+                    sauce.usersDisliked = sauce.usersDisliked.filter(userId => userId !== req.auth.userId); // et on retire l'id de l'utilisateur ayant disliké la sauce du tableau correspondant.
+                } else {
+                    return res.status(400).json({ message: "Vous n'avez pas encore liké ou disliké cette sauce." });
+                }
+            }
+
+            sauce.save()
+                .then(() => res.status(200).json({ message: 'Opération effectuée avec succès.' }))
                 .catch(error => res.status(400).json({ error }));
         })
         .catch(error => res.status(404).json({ error }));
-    } else if (req.body.like === -1){ // Si l'utilisateur à effectué un dislike (puisque si c'est négatif, c'est qu'il est question d'un dislike), alors :
-        Sauce.findOne({ _id: req.params.id })
-            .then((sauce) => {
-                sauce.dislikes += 1; // la valeur est incrémentée ;
-                sauce.usersDisliked.push(req.body.userId); // l'id de l'utilisateur ayant liké la sauce est ajouté dans le tableau correspondant ;
-                sauce.save() // puis tout cela est enregistré dans la base de données.
-                    .then(() => res.status(200).json({ message: 'Sauce dislikée !' }))
-                    .catch(error => res.status(400).json({ error }));
-            })
-            .catch(error => res.status(404).json({ error }));
-    } else { // Si l'utilisateur retire son like ou son dislike, alors :
-        Sauce.findOne({ _id: req.params.id })
-            .then((sauce) => {
-
-                // Précision : dans les deux conditions suivantes, la méthode indexOff est utilisée, cette méthode compare l'élément recheché aux éléments contenus dans le tableau spécifié, 
-                // si l'élément n'est pas trouvé, alors elle renvoie -1 (c'est un peu comme si elle renvoyait "false" en cas d'échec) donc, dans les deux conditions,
-                // en ajoutant "!== -1" on précise que l'on recherche un cas où la réponse de indexOf doit être nécessairement valide (puisque différente de -1).
-                //
-                // Pour être plus concret, en prenant pour exemple la première condition, avant de retirer le like on dit "si dans le tableau usersLiked il y à l'ID de l'utilisateur qui appuie sur le bouton like, alors :" (et les lignes de code en dessous des conditions donnent les instructions à suivre).
-
-                if (sauce.usersLiked.indexOf(req.body.userId) !== -1) { // dans le cas où l'utilisateur avait déjà effectué un "like" :    
-                    sauce.usersLiked.splice(req.body.userId, 1); // l'ID de l'utilisateur est retiré du tableau "usersLiked" ;
-                    sauce.likes -= 1; // la valeur est décrémentée ;                   
-                    sauce.save() // puis tout cela est enregistré dans la base de données.
-                        .then(() => res.status(200).json({ message: 'Like retiré !' }))
-                        .catch(error => res.status(400).json({ error })); 
-                } else if (sauce.usersDisliked.indexOf(req.body.userId) !== -1) {  // dans le cas où l'utilisateur avait déjà effectué un "dislike" :
-                    sauce.usersDisliked.splice(req.body.userId, 1); // l'ID de l'utilisateur est retiré du tableau "usersDisiked" ;
-                    sauce.dislikes -= 1; // la valeur est décrémentée ; 
-                    sauce.save() // puis tout cela est enregistré dans la base de données.
-                        .then(() => res.status(200).json({ message: 'Dislike retiré !' }))
-                        .catch(error => res.status(400).json({ error })); 
-                }
-            })
-            .catch(error => res.status(404).json({ error }));
-        }
 };
